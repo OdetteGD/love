@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>LÖVE Studio — Lua workspace</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#121a2b;--line:#273449;--text:#e6edf7;--muted:#9aabc2;--accent:#77aaff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px system-ui,sans-serif;height:100dvh;display:flex;flex-direction:column}
+header{padding:12px 14px;display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--panel);border-bottom:1px solid var(--line)}header strong{font-size:16px}header small{color:var(--muted);display:block}
+.toolbar{display:flex;gap:7px;flex-wrap:wrap;padding:9px;background:#0e1626;border-bottom:1px solid var(--line)}
+button,label.button{border:1px solid #3b4b65;background:#1b2940;color:var(--text);border-radius:8px;padding:9px 11px;font:inherit;cursor:pointer}button:active,label.button:active{background:#2a3d5b}input[type=file]{display:none}
+main{display:grid;grid-template-columns:170px minmax(0,1fr);min-height:0;flex:1}
+aside{border-right:1px solid var(--line);background:var(--panel);padding:10px;overflow:auto}aside h2{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.file{display:block;width:100%;text-align:left;margin:4px 0;background:transparent;border-color:transparent}.file.active{background:#243550;border-color:#405a7d}
+.workspace{display:flex;flex-direction:column;min-width:0;min-height:0}.tab{padding:9px 12px;border-bottom:1px solid var(--line);color:var(--muted)}
+.editor-wrap{position:relative;display:flex;flex:1;min-height:180px;background:#080d18;overflow:hidden}
+#numbers{padding:12px 8px;text-align:right;color:#64748b;white-space:pre;line-height:1.55;font:13px/1.55 ui-monospace,monospace;user-select:none;min-width:42px;overflow:hidden}
+#editor{border:0;outline:0;resize:none;flex:1;background:transparent;color:#dbeafe;padding:12px 10px;line-height:1.55;font:13px/1.55 ui-monospace,monospace;white-space:pre;overflow:auto;tab-size:4;min-width:0}
+.bottom{height:150px;max-height:32dvh;border-top:1px solid var(--line);display:flex;flex-direction:column;background:#0d1422}
+.bottom-head{padding:8px 12px;display:flex;justify-content:space-between;border-bottom:1px solid var(--line);color:var(--muted)}
+#console{padding:9px 12px;overflow:auto;white-space:pre-wrap;font:12px/1.5 ui-monospace,monospace;color:#cbd5e1}
+.status{padding:6px 12px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;display:flex;justify-content:space-between}
+@media(max-width:560px){main{grid-template-columns:112px minmax(0,1fr)}aside{padding:6px}.toolbar button,.toolbar label.button{padding:8px;font-size:12px}header{align-items:flex-start}header strong{font-size:14px}.bottom{height:125px}}
+</style>
+</head>
+<body>
+<header><div><strong>♥ LÖVE Studio</strong><small>Lua workspace prototype · mobile-first</small></div><small id="saveState">Local workspace</small></header>
+<div class="toolbar">
+<button id="newFile">New file</button><button id="save">Save</button><button id="download">Export .lua</button>
+<label class="button" for="openFile">Import file</label><input id="openFile" type="file" accept=".lua,.txt,.md,.json">
+<button id="runCheck">Check basics</button>
+</div>
+<main>
+<aside><h2>Project files</h2><div id="files"></div><p style="font-size:11px;color:#8292aa">Prototype only: project runner is not connected yet.</p></aside>
+<section class="workspace"><div class="tab" id="activeTab">main.lua</div><div class="editor-wrap"><pre id="numbers">1</pre><textarea id="editor" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Lua source editor"></textarea></div>
+<div class="bottom"><div class="bottom-head"><span>OUTPUT / DIAGNOSTICS</span><button id="clear" style="padding:4px 8px">Clear</button></div><div id="console">Welcome to LÖVE Studio. Create or import a Lua file to begin.\nThis prototype edits and exports source files; it does not execute Lua or launch the native LÖVE runtime.</div></div>
+<div class="status"><span id="cursor">Ln 1, Col 1</span><span id="dirty">Saved</span></div></section>
+</main>
+<script>
+(function(){
+ const starter='function love.load()\n    message = "Hello, LÖVE!"\nend\n\nfunction love.draw()\n    love.graphics.printf(message, 0, 120, love.graphics.getWidth(), "center")\nend\n';
+ const storeKey='love-studio-prototype-v1';
+ let files={ 'main.lua':starter, 'conf.lua':'function love.conf(t)\n    t.window.title = "My LÖVE Game"\n    t.window.width = 960\n    t.window.height = 540\nend\n' };
+ let active='main.lua',dirty=false;
+ try {const saved=JSON.parse(localStorage.getItem(storeKey)||'null');if(saved&&saved.files){files=saved.files;active=saved.active in files?saved.active:Object.keys(files)[0]}}catch(e){}
+ const $=id=>document.getElementById(id), editor=$('editor'), consoleBox=$('console');
+ function log(s){consoleBox.textContent+=('\n'+s);consoleBox.scrollTop=consoleBox.scrollHeight}
+ function persist(){try{localStorage.setItem(storeKey,JSON.stringify({files,active}));$('saveState').textContent='Saved locally'}catch(e){$('saveState').textContent='Local storage unavailable'}dirty=false;$('dirty').textContent='Saved'}
+ function markDirty(){dirty=true;$('dirty').textContent='Unsaved changes';$('saveState').textContent='Editing…'}
+ function renderFiles(){const box=$('files');box.replaceChildren();Object.keys(files).sort().forEach(name=>{const b=document.createElement('button');b.className='file'+(name===active?' active':'');b.textContent=name;b.onclick=()=>switchFile(name);box.appendChild(b)})}
+ function switchFile(name){if(dirty&&!confirm('Discard unsaved edits in '+active+'?'))return;active=name;editor.value=files[name]||'';$('activeTab').textContent=name;dirty=false;$('dirty').textContent='Saved';updateLines();renderFiles();updateCursor()}
+ function updateLines(){const count=editor.value.split('\n').length;$('numbers').textContent=Array.from({length:count},(_,i)=>i+1).join('\n')}
+ function updateCursor(){const before=editor.value.slice(0,editor.selectionStart).split('\n');$('cursor').textContent='Ln '+before.length+', Col '+(before[before.length-1].length+1)}
+ editor.addEventListener('input',()=>{files[active]=editor.value;markDirty();updateLines();updateCursor()});
+ editor.addEventListener('scroll',()=>{$('numbers').scrollTop=editor.scrollTop});
+ editor.addEventListener('click',updateCursor);editor.addEventListener('keyup',updateCursor);
+ editor.addEventListener('keydown',e=>{if(e.key==='Tab'){e.preventDefault();const a=editor.selectionStart,b=editor.selectionEnd;editor.setRangeText('    ',a,b,'end');files[active]=editor.value;markDirty();updateLines();updateCursor()}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();persist();log('Saved workspace to this browser.')}});
+ $('save').onclick=()=>{files[active]=editor.value;persist();log('Saved '+active+' in browser local storage.')};
+ $('newFile').onclick=()=>{const raw=prompt('New file name (example: player.lua)');if(!raw)return;const name=raw.trim();if(!/^[a-zA-Z0-9_.-]+\.([lL][uU][aA]|txt|json|md)$/.test(name)){alert('Use a simple filename ending in .lua, .txt, .json, or .md');return}if(name in files){alert('That file already exists.');return}files[name]='';files[active]=editor.value;active=name;editor.value='';persist();renderFiles();switchFile(name);editor.focus()};
+ $('download').onclick=()=>{const blob=new Blob([editor.value],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=active;a.click();URL.revokeObjectURL(url);log('Exported '+active+' as a file download.')};
+ $('openFile').onchange=async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const name=f.name;if(name in files&&!confirm('Replace '+name+'?'))return;files[active]=editor.value;files[name]=await f.text();active=name;editor.value=files[name];persist();renderFiles();switchFile(name);log('Imported '+name+'.');e.target.value=''};
+ $('runCheck').onclick=()=>{files[active]=editor.value;const src=editor.value;let issues=[];if(!src.trim())issues.push('File is empty.');if((src.match(/\bfunction\b/g)||[]).length>(src.match(/\bend\b/g)||[]).length)issues.push('Possible missing end keyword (basic heuristic only).');if((src.match(/\(/g)||[]).length!==(src.match(/\)/g)||[]).length)issues.push('Parenthesis count differs (basic heuristic only).');if(issues.length)log('Basic checks for '+active+':\n- '+issues.join('\n- '));else log('Basic text checks passed for '+active+'. This is not a Lua parser and does not run the game.')};
+ $('clear').onclick=()=>{consoleBox.textContent='Output cleared.'};
+ window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});
+ renderFiles();editor.value=files[active]||'';$('activeTab').textContent=active;updateLines();updateCursor();
+})();
+</script>
+</body>
+</html>
