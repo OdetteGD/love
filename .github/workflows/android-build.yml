@@ -47,16 +47,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes ninja-build cmake
 
-      - name: Set up Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-          cache: gradle
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Checkout LÖVE Android shell
         uses: actions/checkout@v4
         with:
@@ -64,6 +54,17 @@ jobs:
           ref: main
           path: android-app
           submodules: false
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+          cache-dependency-path: android-app/gradle/wrapper/gradle-wrapper.properties
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: Checkout megasource dependencies
         uses: actions/checkout@v4
