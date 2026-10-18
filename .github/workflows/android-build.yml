@@ -63,8 +63,8 @@ jobs:
           cache: gradle
           cache-dependency-path: android-app/gradle/wrapper/gradle-wrapper.properties
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      # GitHub's ubuntu-latest runner already provides ANDROID_HOME, cmdline-tools and platform-tools.
+      # Avoid re-installing obsolete SDK packages (the Android shell downloads its configured platforms as needed).
 
       - name: Checkout megasource dependencies
         uses: actions/checkout@v4
