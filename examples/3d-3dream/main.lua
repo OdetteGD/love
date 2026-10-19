@@ -13,6 +13,9 @@ function love.load()
     local initialized, err = pcall(function()
         dream:setBloom(1)
         dream:init()
+        -- Register the optional anime material shader. A material can opt in
+        -- with pixelShader = "anime"; default PBR materials remain unchanged.
+        dream:registerShader("examples/3d-3dream/shaders/anime", "anime")
         object = dream:loadObject("examples/monkey/object")
         light = dream:newLight("point", dream.vec3(3, 2, 1), dream.vec3(1.0, 0.82, 0.62), 35.0)
         light:addNewShadow()
