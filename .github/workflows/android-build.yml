@@ -2,13 +2,13 @@ name: Android APK Build
 
 on:
   push:
-    branches: [main]
+    branches: [main, "revival/**"]
     paths:
       - '.github/workflows/android-build.yml'
       - 'CMakeLists.txt'
       - 'src/**'
       - 'platform/**'
-      - 'REVIVAL_ROADMAP.md'
+      - 'REVIVAL_ROADMAP.md'\n      - 'examples/**'\n      - 'tools/love-studio/**'
   pull_request:
     paths:
       - '.github/workflows/android-build.yml'
