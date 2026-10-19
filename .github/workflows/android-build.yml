@@ -8,13 +8,17 @@ on:
       - 'CMakeLists.txt'
       - 'src/**'
       - 'platform/**'
-      - 'REVIVAL_ROADMAP.md'\n      - 'examples/**'\n      - 'tools/love-studio/**'
+      - 'REVIVAL_ROADMAP.md'
+      - 'examples/**'
+      - 'tools/love-studio/**'
   pull_request:
     paths:
       - '.github/workflows/android-build.yml'
       - 'CMakeLists.txt'
       - 'src/**'
       - 'platform/**'
+      - 'examples/**'
+      - 'tools/love-studio/**'
   workflow_dispatch:
     inputs:
       build_type:
