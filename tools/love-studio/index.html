@@ -23,6 +23,37 @@ aside{border-right:1px solid var(--line);background:var(--panel);padding:10px;ov
 #console{padding:9px 12px;overflow:auto;white-space:pre-wrap;font:12px/1.5 ui-monospace,monospace;color:#cbd5e1}
 .status{padding:6px 12px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;display:flex;justify-content:space-between}
 @media(max-width:560px){main{grid-template-columns:112px minmax(0,1fr)}aside{padding:6px}.toolbar button,.toolbar label.button{padding:8px;font-size:12px}header{align-items:flex-start}header strong{font-size:14px}.bottom{height:125px}}
+
+/* Polished studio shell: compact, high-contrast, responsive and touch friendly. */
+:root{--bg:#090d16;--panel:#101725;--panel2:#151f30;--line:#273449;--text:#e8edf7;--muted:#93a4bc;--accent:#9b8cff;--good:#8be0bd;--danger:#ff9d9d}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.01em;background:radial-gradient(ellipse at 82% -18%,#26224a 0,transparent 36%),var(--bg)}
+header{padding:13px 18px;background:rgba(16,23,37,.94);backdrop-filter:blur(16px);gap:16px}
+header strong{font-size:16px;letter-spacing:-.03em}header strong:first-letter{color:var(--accent)}
+header small{font-size:11px;letter-spacing:.035em}
+.toolbar{padding:9px 12px;gap:8px;background:rgba(12,18,30,.94)}
+button,label.button{border:1px solid #33425a;background:linear-gradient(180deg,#202d42,#172235);border-radius:9px;padding:8px 12px;transition:border-color .15s,transform .15s,background .15s}
+button:hover,label.button:hover{border-color:#8278d7;background:#252d4a}
+button:focus-visible,label.button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:active,label.button:active{transform:translateY(1px)}
+main{grid-template-columns:205px minmax(0,1fr)}
+aside{padding:14px 10px;background:rgba(16,23,37,.88)}
+aside h2{font-size:10px;letter-spacing:.16em;margin:5px 7px 13px}
+.file{padding:9px 10px;border-radius:8px;color:#b9c5d8;font-size:12px;margin:3px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file.active{background:linear-gradient(90deg,#302b53,#202b40);border-color:#6258a6;color:#fff}
+.workspace{background:#0b111d}
+.tab{background:#101725;color:#d7def0;font-size:12px;border-bottom-color:#29354a}
+.editor-wrap{background:#090e18}
+#numbers{color:#4e607a;background:#0c1320;padding-left:12px;padding-right:10px;border-right:1px solid #1d293b}
+#editor{color:#e2e8f7;caret-color:#c0b7ff;tab-size:4}
+#editor::selection{background:#5d5688}
+.bottom{height:160px;background:#0d1421;border-top-color:#29354a}
+.bottom-head{font-size:10px;letter-spacing:.13em;color:#a5b3c9}
+#console{color:#c2cde0;font-size:11px}
+.status{background:#101725;border-top-color:#29354a;font-size:10px;letter-spacing:.04em}
+#saveState{color:var(--good)}
+@media(min-width:1000px){main{grid-template-columns:230px minmax(0,1fr)}.editor-wrap{min-height:260px}#editor{font-size:13px}}
+@media(max-width:560px){main{grid-template-columns:112px minmax(0,1fr)}header{padding:10px 12px}.toolbar{padding:7px;gap:5px}.toolbar button,.toolbar label.button{padding:8px 9px;border-radius:8px}.file{font-size:11px;padding:8px 6px}.bottom{height:135px}#editor{padding:10px 8px;font-size:12px}#numbers{padding:10px 6px;min-width:32px}}
+
 </style>
 </head>
 <body>
